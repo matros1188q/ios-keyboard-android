@@ -1,0 +1,60 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+    paths:
+      - "android-project.zip.b64"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android platform and build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+      - name: Extract Android project
+        run: |
+          base64 --decode android-project.zip.b64 > /tmp/ios-keyboard-project.zip
+          mkdir -p /tmp/ios-keyboard-source
+          unzip -q /tmp/ios-keyboard-project.zip -d /tmp/ios-keyboard-source
+          cp /tmp/ios-keyboard-source/ios-keyboard-project/build.gradle .
+          cp /tmp/ios-keyboard-source/ios-keyboard-project/settings.gradle .
+          cp /tmp/ios-keyboard-source/ios-keyboard-project/gradle.properties .
+          rm -rf app
+          cp -R /tmp/ios-keyboard-source/ios-keyboard-project/app ./app
+      - name: Build debug APK
+        run: gradle --no-daemon assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-keyboard-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+      - name: Remove temporary source payload from repository
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm -f android-project.zip.b64
+          git commit -m "Remove temporary build payload [skip ci]"
+          git push
