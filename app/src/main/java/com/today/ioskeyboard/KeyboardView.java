@@ -135,7 +135,7 @@ public class KeyboardView extends View {
             rows.add(chars("1234567890"));
             rows.add(chars("@#$%&-+()/"));
             rows.add(row(
-                    key("=\\<", "", "symbols", 1.25f), letter("*"), letter("\\""),
+                    key("=\\<", "", "symbols", 1.25f), letter("*"), letter("\\"),
                     letter("'"), letter(":"), letter(";"), letter("!"), letter("?"),
                     key("⌫", "", "delete", 1.25f)));
             rows.add(bottomRow());
