@@ -175,7 +175,7 @@ public class IosKeyboardService extends InputMethodService
         requestedWord = word;
         int sequence = ++requestSequence;
         try {
-            spellChecker.getSuggestions(new TextInfo(word, 0, sequence), 5, false);
+            spellChecker.getSuggestions(new TextInfo[] { new TextInfo(word, 0, sequence) }, 5, false);
         } catch (Exception ignored) {
             publishSuggestions(new String[0]);
         }
