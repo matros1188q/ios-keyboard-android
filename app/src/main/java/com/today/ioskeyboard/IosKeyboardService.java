@@ -1,14 +1,10 @@
 package com.today.ioskeyboard;
 
 import android.inputmethodservice.InputMethodService;
+import android.os.Build;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.os.Build;
-import android.view.inputmethod.InputMethodManager;
-import android.view.inputmethod.InputConnection;
-import android.content.Context;
-import android.view.inputmethod.EditorInfo;
 
 public class IosKeyboardService extends InputMethodService {
     private KeyboardView keyboard;
@@ -48,8 +44,4 @@ public class IosKeyboardService extends InputMethodService {
         }
     }
 
-    void showLanguagePicker() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) switchToNextInputMethod(false);
-    }
 }
