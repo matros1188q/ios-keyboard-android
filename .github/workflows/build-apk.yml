@@ -4,11 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches: ["main"]
-    paths:
-      - "android-project.zip.b64"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -16,8 +14,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -31,16 +27,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.9"
-      - name: Extract Android project
-        run: |
-          base64 --decode android-project.zip.b64 > /tmp/ios-keyboard-project.zip
-          mkdir -p /tmp/ios-keyboard-source
-          unzip -q /tmp/ios-keyboard-project.zip -d /tmp/ios-keyboard-source
-          cp /tmp/ios-keyboard-source/ios-keyboard-project/build.gradle .
-          cp /tmp/ios-keyboard-source/ios-keyboard-project/settings.gradle .
-          cp /tmp/ios-keyboard-source/ios-keyboard-project/gradle.properties .
-          rm -rf app
-          cp -R /tmp/ios-keyboard-source/ios-keyboard-project/app ./app
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug
       - name: Upload APK
@@ -50,11 +36,3 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
-      - name: Remove temporary source payload from repository
-        if: success()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git rm -f android-project.zip.b64
-          git commit -m "Remove temporary build payload [skip ci]"
-          git push
