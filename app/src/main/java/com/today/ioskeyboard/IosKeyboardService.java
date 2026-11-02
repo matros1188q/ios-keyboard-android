@@ -4,6 +4,7 @@ import android.inputmethodservice.InputMethodService;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
+import android.os.Build;
 import android.view.inputmethod.InputMethodManager;
 import android.view.inputmethod.InputConnection;
 import android.content.Context;
@@ -31,7 +32,8 @@ public class IosKeyboardService extends InputMethodService {
     void deleteOne() {
         InputConnection ic = getCurrentInputConnection();
         if (ic == null) return;
-        ic.deleteSurroundingTextInCodePoints(1, 0);
+        if (Build.VERSION.SDK_INT >= 24) ic.deleteSurroundingTextInCodePoints(1, 0);
+        else ic.deleteSurroundingText(1, 0);
     }
 
     void enter() {
